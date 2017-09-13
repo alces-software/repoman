@@ -1,0 +1,5 @@
+source: alces
+repotype: client
+repopath: /opt/alces/repo
+distro: centos
+version: 7
