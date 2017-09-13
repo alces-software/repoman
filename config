@@ -1,4 +1,4 @@
 sources:
-  upstream: http://centos.org/repo
-  aws: http://alces-repo.s3.aws.amazon.com/repo
-  alces: http://repo.alces-software.com/repo
+  upstream: http://repo.alces-software.com/repoman/upstream.repos
+  aws: http://repo.alces-software.com/repoman/aws.repos
+  alces: http://repo.alces-software.com/repoman/alces.repos
