@@ -4,11 +4,11 @@ $LOAD_PATH << File.dirname(__FILE__)
 
 # Requirements
 require 'option_parser'
-#require 'commands'
+require 'commands'
 require 'config_file'
 
 # Load config file
-repoconfig = ConfigFile::ConfigBase.new('.repoman')
+repoconfig = ConfigFile::Base.new('.repoman')
 
 # Parse arguments
 options = MainParser.parse(ARGV)
@@ -19,9 +19,9 @@ repoconfig.merge(options)
 # Decide on function to run
 case ARGV[0]
 when "client"
-  puts "running client command with: #{repoconfig.inspect}"
+  Commands.Client.run(repoconfig)
 when "server"
-  puts "running server command with: #{repoconfig.inspect}"
+  Commands.Server.run(repoconfig)
 else
   options = MainParser.parse(['--help']) 
 end

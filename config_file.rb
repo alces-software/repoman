@@ -2,7 +2,7 @@
 require 'yaml'
 
 module ConfigFile
-  class ConfigBase
+  class Base
 
     def initialize(file)
       @file_path = file
