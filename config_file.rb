@@ -20,8 +20,13 @@ module ConfigFile
       end
     end
 
-    def merge(yaml)
-      puts 'merging CLI options into config file'
+    def merge(hash)
+      hash.each do |key, val|
+        # TODO - at some sort of good validator
+        if @config.key?(key)
+          @config[key] = val
+        end
+      end
     end
 
   end
