@@ -64,7 +64,7 @@ module Commands
       exit 1
     end
 
-    def self._get_source_path(file)
+    def self._get_source_file_path(file)
       # Split distro at integer and join back together with /
       return "#{$repomanroot}/templates/#{@args['distro'].split(/(\d+)/).join('/')}/#{file}"
     end
@@ -79,7 +79,7 @@ module Commands
     def self.main
       sourcefiles = []
       @args['include'].each do |repo|
-        sourcefiles << self._get_source_path(repo)
+        sourcefiles << self._get_source_file_path(repo)
       end
       %x(cat #{sourcefiles.join(' ')} > #{@args['outfile']})
       puts "The file(s) #{sourcefiles.join(' ')} have been saved to #{@args['outfile']}"
@@ -94,11 +94,12 @@ module Commands
     end
 
     def self.main
+      @repoconf = @args['reporoot'] + '/mirror.conf'
       self.setup_repo
       @args['include'].each do |file|
         # Loop through each repository defined in file
-        File.read(self._get_source_path(file)).scan(/(?<=name=).*/).each do |repo|
-          self.sync_repos(repo)
+        File.read(self._get_source_file_path(file)).scan(/(?<=name=).*/).each do |repo|
+          self.sync_repo(repo)
           self.generate_metadata(repo)
         end
       end
@@ -111,8 +112,7 @@ module Commands
       end
 
       # Create top of mirror.conf file with general config
-      repoconf = @args['reporoot'] + '/mirror.conf'
-      File.write(repoconf, '
+      File.write(@repoconf, '
 [main]
 cachedir=/var/cache/yum/$basearch/$releasever
 keepcache=0
@@ -129,16 +129,25 @@ reposdir=/dev/null
 
       # Add all additional repo data to file
       @args['include'].each do |file|
-        File.write(repoconf, %x(cat #{self._get_source_path(file)}), File.size(repoconf), mode: 'a')
+        File.write(@repoconf, %x(cat #{self._get_source_file_path(file)}), File.size(@repoconf), mode: 'a')
       end
     end
 
-    def self.sync_repos(repo)
-      1
+    def self.sync_repo(repo)
+      if @args['mirror']
+        %x(reposync -nm --config #{@repoconf} -r #{repo} -p #{self._get_repo_path(repo)} --norepopath)
+      end
     end
 
     def self.generate_metadata(repo)
-      2
+      if @args['meta']
+        %x(createrepo #{self._get_repo_path(repo)})
+      end
+    end
+
+    def self._get_repo_path(file)
+      # Split distro at integer and join back together with /
+      return "#{@args['reporoot']}/#{file.split(/-/).join('/')}/"
     end
   end
 
