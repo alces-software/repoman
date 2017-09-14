@@ -22,8 +22,7 @@
 
 require 'fileutils'
 
-#$repomanroot = '/opt/repoman'
-$repomanroot = '/Users/stu/RUBY/repoman'
+$repomanroot = '/opt/repoman'
 
 module Commands
   
