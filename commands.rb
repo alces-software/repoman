@@ -20,6 +20,11 @@
 # https://github.com/alces-software/repoman
 #==============================================================================
 
+require 'fileutils'
+
+#$repomanroot = '/opt/repoman'
+$repomanroot = '/Users/stu/RUBY/repoman'
+
 module Commands
   
   class Base
@@ -27,7 +32,7 @@ module Commands
     def self.run(args)
       @required_base = ['distro','include']
       @args = args
-      puts "running command with: #{@args}"
+      #puts "running command with: #{@args}"
       self.check_required
       self.main
     end
@@ -61,7 +66,7 @@ module Commands
 
     def self._get_source_path(file)
       # Split distro at integer and join back together with /
-      return "templates/#{@args['distro'].split(/(\d+)/).join('/')}/#{file}"
+      return "#{$repomanroot}/templates/#{@args['distro'].split(/(\d+)/).join('/')}/#{file}"
     end
 
   end
@@ -77,13 +82,63 @@ module Commands
         sourcefiles << self._get_source_path(repo)
       end
       %x(cat #{sourcefiles.join(' ')} > #{@args['outfile']})
+      puts "The file(s) #{sourcefiles.join(' ')} have been saved to #{@args['outfile']}"
     end
 
   end
 
   class Mirror < Base
     def self._required_other
-      @required_other = ['mirrordest', 'configurlsearch', 'configurlreplace', 'configfile']
+      #@required_other = ['reporoot', 'configurlsearch', 'configurlreplace', 'configfile']
+      @required_other = ['reporoot']
+    end
+
+    def self.main
+      self.setup_repo
+      @args['include'].each do |file|
+        # Loop through each repository defined in file
+        File.read(self._get_source_path(file)).scan(/(?<=name=).*/).each do |repo|
+          self.sync_repos(repo)
+          self.generate_metadata(repo)
+        end
+      end
+    end
+
+    def self.setup_repo
+      # Create reporoot if it doesn't exist
+      if ! File.directory?(@args['reporoot'])
+        FileUtils::mkdir_p @args['reporoot']
+      end
+
+      # Create top of mirror.conf file with general config
+      repoconf = @args['reporoot'] + '/mirror.conf'
+      File.write(repoconf, '
+[main]
+cachedir=/var/cache/yum/$basearch/$releasever
+keepcache=0
+debuglevel=2
+logfile=/var/log/yum.log
+exactarch=1
+obsoletes=1
+gpgcheck=1
+plugins=1
+installonly_limit=5
+reposdir=/dev/null
+
+')
+
+      # Add all additional repo data to file
+      @args['include'].each do |file|
+        File.write(repoconf, %x(cat #{self._get_source_path(file)}), File.size(repoconf), mode: 'a')
+      end
+    end
+
+    def self.sync_repos(repo)
+      1
+    end
+
+    def self.generate_metadata(repo)
+      2
     end
   end
 

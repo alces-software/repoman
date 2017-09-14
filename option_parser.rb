@@ -52,8 +52,8 @@ class MainParser
         options["outfile"] = outfile
       end
 
-      opt.on("-m","--mirrordest PATH","mirror repository path [MIRROR ONLY]") do |mirrordest|
-        options["mirrordest"] = mirrordest
+      opt.on("-r","--reporoot PATH","mirror repository root path [MIRROR ONLY]") do |reporoot|
+        options["reporoot"] = reporoot
       end
 
       opt.on("--configurlsearch URL-TO-FIND","the url string to be replaced by `configurlreplace` in `configfile` [MIRROR ONLY]") do |urlsearch|
