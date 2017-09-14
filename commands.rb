@@ -23,21 +23,68 @@
 module Commands
   
   class Base
-    def run(args)
-      puts 'running command'
-      args
+    
+    def self.run(args)
+      @required_base = ['distro','include']
+      @args = args
+      puts "running command with: #{@args}"
+      self.check_required
+      self.main
     end
 
-    def _generate_config
+    def self._required_other
+      @required_other = []
+    end
 
+    def self.check_required
+      #puts "checking for required options"
+      self._required_other
+      missing = []
+      required = @required_base + @required_other
+      required.each do |key|
+        if ! @args.key?(key)
+           missing << "--#{key}"
+        end
+      end
+
+      if missing.any?
+        puts "missing arg(s): #{missing.join(", ")}"
+        exit 1
+      end
+
+    end
+
+    def self.main
+      puts "oops, `self.main` hasn't been overridden in child class!"
+      exit 1
+    end
+
+    def self._get_source_path(file)
+      # Split distro at integer and join back together with /
+      return "templates/#{@args['distro'].split(/(\d+)/).join('/')}/#{file}"
     end
 
   end
 
-  class Client < Base
+  class Generate < Base
+    def self._required_other
+      @required_other = ['outfile']
+    end
+
+    def self.main
+      sourcefiles = []
+      @args['include'].each do |repo|
+        sourcefiles << self._get_source_path(repo)
+      end
+      %x(cat #{sourcefiles.join(' ')} > #{@args['outfile']})
+    end
+
   end
 
-  class Server < Base
+  class Mirror < Base
+    def self._required_other
+      @required_other = ['mirrordest', 'configurlsearch', 'configurlreplace', 'configfile']
+    end
   end
 
 end
