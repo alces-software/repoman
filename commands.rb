@@ -134,6 +134,11 @@ reposdir=/dev/null
       if @args['mirror']
         puts "Syncing #{repo}"
         %x(reposync -nm --config #{@repoconf} -r #{repo} -p #{self._get_repo_path(repo)} --norepopath)
+        if repo.include?('base')
+          puts "Downloading pxeboot files"
+          source_url = %x(yum --config #{@repoconf} repoinfo #{repo}).scan(/(?<=baseurl : ).*/)
+          %x(wget -N #{source_url}/images/pxeboot/{initird.img,vmlinuz} -P #{self._get_repo_path(repo)}/images/pxeboot/)
+        end
       end
     end
 
