@@ -1,4 +1,0 @@
-sources:
-  upstream: http://repo.alces-software.com/repoman/upstream.repos
-  aws: http://repo.alces-software.com/repoman/aws.repos
-  alces: http://repo.alces-software.com/repoman/alces.repos
