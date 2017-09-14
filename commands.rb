@@ -139,8 +139,9 @@ reposdir=/dev/null
 
     def self.generate_metadata(repo)
       if @args['meta']
+        group_data = if File.file?(self._get_repo_path(repo) + '/comps.xml') then '-g comps.xml' else '' end
         puts "Generating metadata for #{repo}"
-        %x(createrepo #{self._get_repo_path(repo)})
+        %x(createrepo #{group_data} #{self._get_repo_path(repo)})
       end
     end
 
