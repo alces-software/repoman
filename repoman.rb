@@ -39,12 +39,3 @@ when "mirror"
 else
   options = MainParser.parse(['--help']) 
 end
-
-=begin
-# Write out file
-if options['save']
-  repoconfig.write_to_config
-else
-  puts 'not_saving'
-end
-=end
