@@ -28,7 +28,6 @@ class MainParser
     options = {}
 
     # Default options
-    options['save'] = true
     options['mirror'] = true
     options['meta'] = true
     
@@ -36,21 +35,37 @@ class MainParser
       opt.banner = "Usage: repoman COMMAND [OPTIONS]"
       opt.separator  ""
       opt.separator  "Commands"
-      opt.separator  "    client: setup client repo config files"
-      opt.separator  "    server: mirror upstream repos"
+      opt.separator  "    generate: setup client repo config files"
+      opt.separator  "    mirror: clone upstream repos"
       opt.separator  ""
       opt.separator  "Options"
 
-      opt.on("-s","--source SOURCE","which upstream repository should be used") do |source|
-        options["source"] = source
+      opt.on("-i","--include REPOLIST",Array,"which repositories should be used") do |repos|
+        options["include"] = repos
       end
 
       opt.on("-d","--distro DISTRO","operating system to use") do |distro|
         options["distro"] = distro
       end
 
-      opt.on("-r","--release VERSION",Numeric,"operating system version to use") do |version|
-        options["version"] = version
+      opt.on("-o","--outfile OUTPUTFILE","repo config output file [GENERATE ONLY]") do |outfile|
+        options["outfile"] = outfile
+      end
+
+      opt.on("-m","--mirrordest PATH","mirror repository path [MIRROR ONLY]") do |mirrordest|
+        options["mirrordest"] = mirrordest
+      end
+
+      opt.on("--configurlsearch URL-TO-FIND","the url string to be replaced by `configurlreplace` in `configfile` [MIRROR ONLY]") do |urlsearch|
+        options["configurlsearch"] = urlsearch
+      end
+
+      opt.on("--configurlreplace URL-TO-REPLACE","the url string to replace `configurlsearch` in `configfile` [MIRROR ONLY]") do |urlreplace|
+        options["configurlreplace"] = urlreplace
+      end
+
+      opt.on("--configfile","the file to perform url replacement on [MIRROR ONLY]") do |configfile|
+        options["configfile"] = configfile
       end
 
       opt.on("-h","--help","help") do
@@ -58,15 +73,11 @@ class MainParser
         exit
       end
 
-      opt.on("--no-save","do not update config file with any settings changes") do |save|
-        options['save'] = save
-      end
-
-      opt.on("--no-mirror","do not update repository packages [SERVER ONLY]") do |mirror|
+      opt.on("--no-mirror","do not update repository packages [MIRROR ONLY]") do |mirror|
         options['mirror'] = mirror
       end
 
-      opt.on("--no-meta","do not update repository metadata [SERVER ONLY]") do |meta|
+      opt.on("--no-meta","do not update repository metadata [MIRROR ONLY]") do |meta|
         options['meta'] = meta
       end
     end
