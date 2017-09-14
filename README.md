@@ -18,11 +18,11 @@ git clone https://github.com/alces-software/repoman.git
 * To setup a client (include files can be found under `templates/`)
 
 ```bash
-repoman generate --distro centos7 --include base.upstream,lustre.upstream --outfile /etc/yum.repos.d/myrepo.conf
+/opt/repoman/repoman.rb generate --distro centos7 --include base.upstream,lustre.upstream --outfile /etc/yum.repos.d/myrepo.conf
 ```
 
 * To setup a server
 
 ```bash
-repoman mirror --distro rhel7 --include base.local --reporoot /opt/alces/repo
+/opt/repoman/repoman.rb mirror --distro rhel7 --include base.local --reporoot /opt/alces/repo
 ```
