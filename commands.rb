@@ -31,7 +31,6 @@ module Commands
     def self.run(args)
       @required_base = ['distro','include']
       @args = args
-      #puts "running command with: #{@args}"
       self.check_required
       self.main
     end
@@ -41,7 +40,6 @@ module Commands
     end
 
     def self.check_required
-      #puts "checking for required options"
       self._required_other
       missing = []
       required = @required_base + @required_other
@@ -134,19 +132,21 @@ reposdir=/dev/null
 
     def self.sync_repo(repo)
       if @args['mirror']
+        puts "Syncing #{repo}"
         %x(reposync -nm --config #{@repoconf} -r #{repo} -p #{self._get_repo_path(repo)} --norepopath)
       end
     end
 
     def self.generate_metadata(repo)
       if @args['meta']
+        puts "Generating metadata for #{repo}"
         %x(createrepo #{self._get_repo_path(repo)})
       end
     end
 
-    def self._get_repo_path(file)
+    def self._get_repo_path(reponame)
       # Split distro at integer and join back together with /
-      return "#{@args['reporoot']}/#{file.split(/-/).join('/')}/"
+      return "#{@args['reporoot']}/#{reponame.split(/-/).join('/')}/"
     end
   end
 
