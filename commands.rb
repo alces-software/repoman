@@ -32,6 +32,7 @@ module Commands
       @required_base = ['distro','include']
       @args = args
       self.check_required
+      self.validate
       self.main
     end
 
@@ -56,14 +57,33 @@ module Commands
 
     end
 
+    def self.validate
+      self._if_exists(self._get_source_path)
+      @args['include'].each do |repo|
+        self._if_exists(self._get_source_file_path(repo))
+      end
+    end
+
+    def self._if_exists(file_or_dir)
+      if ! File.exist?(file_or_dir)
+        puts "#{file_or_dir} does not exist"
+        exit 1
+      end
+    end
+
     def self.main
       puts "oops, `self.main` hasn't been overridden in child class!"
       exit 1
     end
 
+    def self._get_source_path()
+      return "#{$repomanroot}/templates/#{@args['distro'].split(/(\d+)/).join('/')}"
+    end
+
     def self._get_source_file_path(file)
       # Split distro at integer and join back together with /
-      return "#{$repomanroot}/templates/#{@args['distro'].split(/(\d+)/).join('/')}/#{file}"
+      #return "#{$repomanroot}/templates/#{@args['distro'].split(/(\d+)/).join('/')}/#{file}"
+      return "#{self._get_source_path}/#{file}"
     end
 
   end
@@ -105,7 +125,13 @@ module Commands
     def self.setup_repo
       # Create reporoot if it doesn't exist
       if ! File.directory?(@args['reporoot'])
-        FileUtils::mkdir_p @args['reporoot']
+        begin
+          FileUtils::mkdir_p @args['reporoot']
+
+          rescue SystemCallError
+            puts "An error occurred when creating #{@args['reporoot']}, most likely the user has insufficient permissions to create the directory"
+            exit 1
+        end
       end
 
       # Create top of mirror.conf file with general config
