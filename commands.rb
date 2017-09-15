@@ -113,12 +113,10 @@ module Commands
     def self.main
       @repoconf = @args['reporoot'] + '/mirror.conf'
       self.setup_repo
-      @args['include'].each do |file|
-        # Loop through each repository defined in file
-        File.read(@repoconf).scan(/(?<=name=).*/).each do |repo|
-          self.sync_repo(repo)
-          self.generate_metadata(repo)
-        end
+      # Loop through each repository defined in file
+      File.read(@repoconf).scan(/(?<=name=).*/).each do |repo|
+        self.sync_repo(repo)
+        self.generate_metadata(repo)
       end
     end
 
@@ -156,6 +154,8 @@ module Commands
         @args['include'].each do |file|
           File.write(@repoconf, %x(cat #{self._get_source_file_path(file)}), File.size(@repoconf), mode: 'a')
         end
+      else
+        self._if_exists(@repoconf)
       end
     end
 
