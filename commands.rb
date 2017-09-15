@@ -87,7 +87,7 @@ module Commands
   end
 
   class Generate < Base
-    def self._required_other
+    def self._required_init
       @required = ['distro', 'include', 'outfile']
     end
 
@@ -103,7 +103,7 @@ module Commands
   end
 
   class Mirror < Base
-    def self._required_other
+    def self._required_init
       if ! @args['conf']
         @required = ['reporoot']
       else
