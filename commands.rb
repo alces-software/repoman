@@ -57,9 +57,10 @@ module Commands
 
     def self.validate
       self._if_exists(self._get_source_path)
-      @args['include'].each do |repo|
-        self._if_exists(self._get_source_file_path(repo))
-      end
+      self.validate_other
+    end
+
+    def self.validate_other
     end
 
     def self._if_exists(file_or_dir)
@@ -89,6 +90,12 @@ module Commands
   class Generate < Base
     def self._required_init
       @required = ['distro', 'include', 'outfile']
+    end
+
+    def self.validate_other
+      @args['include'].each do |repo|
+        self._if_exists(self._get_source_file_path(repo))
+      end
     end
 
     def self.main
