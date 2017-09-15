@@ -144,19 +144,19 @@ module Commands
 
         # Create top of mirror.conf file with general config
         File.write(@repoconf, '
-  [main]
-  cachedir=/var/cache/yum/$basearch/$releasever
-  keepcache=0
-  debuglevel=2
-  logfile=/var/log/yum.log
-  exactarch=1
-  obsoletes=1
-  gpgcheck=1
-  plugins=1
-  installonly_limit=5
-  reposdir=/dev/null
+[main]
+cachedir=/var/cache/yum/$basearch/$releasever
+keepcache=0
+debuglevel=2
+logfile=/var/log/yum.log
+exactarch=1
+obsoletes=1
+gpgcheck=1
+plugins=1
+installonly_limit=5
+reposdir=/dev/null
 
-  ')
+')
 
         # Add all additional repo data to file
         @args['include'].each do |file|
