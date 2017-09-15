@@ -29,22 +29,20 @@ module Commands
   class Base
     
     def self.run(args)
-      @required_base = ['distro','include']
       @args = args
       self.check_required
       self.validate
       self.main
     end
 
-    def self._required_other
-      @required_other = []
+    def self._required_init
+      @required = []
     end
 
     def self.check_required
-      self._required_other
+      self._required_init
       missing = []
-      required = @required_base + @required_other
-      required.each do |key|
+      @required.each do |key|
         if ! @args.key?(key)
            missing << "--#{key}"
         end
@@ -90,7 +88,7 @@ module Commands
 
   class Generate < Base
     def self._required_other
-      @required_other = ['outfile']
+      @required = ['distro', 'include', 'outfile']
     end
 
     def self.main
@@ -106,8 +104,11 @@ module Commands
 
   class Mirror < Base
     def self._required_other
-      #@required_other = ['reporoot', 'configurlsearch', 'configurlreplace', 'configfile']
-      @required_other = ['reporoot']
+      if ! @args['conf']
+        @required = ['reporoot']
+      else
+        @required = ['distro', 'include', 'reporoot']
+      end
     end
 
     def self.main
