@@ -30,6 +30,7 @@ class MainParser
     # Default options
     options['mirror'] = true
     options['meta'] = true
+    options['conf'] = true
     
     opt_parser = OptionParser.new do |opt|
       opt.banner = "Usage: repoman COMMAND [OPTIONS]"
@@ -80,6 +81,11 @@ class MainParser
       opt.on("--no-meta","do not update repository metadata [MIRROR ONLY]") do |meta|
         options['meta'] = meta
       end
+
+      opt.on("--no-conf","do not update repository conf file [MIRROR ONLY]") do |conf|
+        options['conf'] = conf
+      end
+
     end
     # Remove options from ARGV and store within opt_parser object
     opt_parser.parse!(args)

@@ -115,7 +115,7 @@ module Commands
       self.setup_repo
       @args['include'].each do |file|
         # Loop through each repository defined in file
-        File.read(self._get_source_file_path(file)).scan(/(?<=name=).*/).each do |repo|
+        File.read(@repoconf).scan(/(?<=name=).*/).each do |repo|
           self.sync_repo(repo)
           self.generate_metadata(repo)
         end
@@ -123,36 +123,39 @@ module Commands
     end
 
     def self.setup_repo
-      # Create reporoot if it doesn't exist
-      if ! File.directory?(@args['reporoot'])
-        begin
-          FileUtils::mkdir_p @args['reporoot']
+      if @args['conf']
 
-          rescue SystemCallError
-            puts "An error occurred when creating #{@args['reporoot']}, most likely the user has insufficient permissions to create the directory"
-            exit 1
+        # Create reporoot if it doesn't exist
+        if ! File.directory?(@args['reporoot'])
+          begin
+            FileUtils::mkdir_p @args['reporoot']
+
+            rescue SystemCallError
+              puts "An error occurred when creating #{@args['reporoot']}, most likely the user has insufficient permissions to create the directory"
+              exit 1
+          end
         end
-      end
 
-      # Create top of mirror.conf file with general config
-      File.write(@repoconf, '
-[main]
-cachedir=/var/cache/yum/$basearch/$releasever
-keepcache=0
-debuglevel=2
-logfile=/var/log/yum.log
-exactarch=1
-obsoletes=1
-gpgcheck=1
-plugins=1
-installonly_limit=5
-reposdir=/dev/null
+        # Create top of mirror.conf file with general config
+        File.write(@repoconf, '
+  [main]
+  cachedir=/var/cache/yum/$basearch/$releasever
+  keepcache=0
+  debuglevel=2
+  logfile=/var/log/yum.log
+  exactarch=1
+  obsoletes=1
+  gpgcheck=1
+  plugins=1
+  installonly_limit=5
+  reposdir=/dev/null
 
-')
+  ')
 
-      # Add all additional repo data to file
-      @args['include'].each do |file|
-        File.write(@repoconf, %x(cat #{self._get_source_file_path(file)}), File.size(@repoconf), mode: 'a')
+        # Add all additional repo data to file
+        @args['include'].each do |file|
+          File.write(@repoconf, %x(cat #{self._get_source_file_path(file)}), File.size(@repoconf), mode: 'a')
+        end
       end
     end
 
