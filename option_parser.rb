@@ -57,21 +57,21 @@ class MainParser
         options["reporoot"] = reporoot
       end
 
-      opt.on("--configurlsearch URL-TO-FIND","the url string to be replaced by `configurlreplace` in `configfile` [MIRROR ONLY]") do |urlsearch|
+      opt.on("-h","--help","show this help screen") do
+        puts opt
+        exit
+      end
+
+      opt.on("--configurlsearch URL-TO-FIND","the url string to be replaced by","`configurlreplace` in `configfile` [MIRROR ONLY]") do |urlsearch|
         options["configurlsearch"] = urlsearch
       end
 
-      opt.on("--configurlreplace URL-TO-REPLACE","the url string to replace `configurlsearch` in `configfile` [MIRROR ONLY]") do |urlreplace|
+      opt.on("--configurlreplace URL-TO-REPLACE","the url string to replace","`configurlsearch` in `configfile` [MIRROR ONLY]") do |urlreplace|
         options["configurlreplace"] = urlreplace
       end
 
       opt.on("--configfile","the file to perform url replacement on [MIRROR ONLY]") do |configfile|
         options["configfile"] = configfile
-      end
-
-      opt.on("-h","--help","help") do
-        puts opt
-        exit
       end
 
       opt.on("--no-mirror","do not update repository packages [MIRROR ONLY]") do |mirror|
