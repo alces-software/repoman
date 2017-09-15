@@ -82,7 +82,7 @@ class MainParser
         options['meta'] = meta
       end
 
-      opt.on("--no-conf","do not update repository conf file [MIRROR ONLY]") do |conf|
+      opt.on("--no-conf","do not setup repository but update existing repos [MIRROR ONLY]") do |conf|
         options['conf'] = conf
       end
 
