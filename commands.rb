@@ -181,6 +181,7 @@ reposdir=/dev/null
           puts "Downloading pxeboot files"
           source_url = %x(yum --config #{@repoconf} repoinfo #{repo}).scan(/(?<=baseurl : ).*/)[0]
           %x(wget -q -N #{source_url}/images/pxeboot/{initrd.img,vmlinuz} -P #{self._get_repo_path(repo)}/images/pxeboot/)
+          %x(wget -q -N #{source_url}/LiveOS/squashfs.img -P #{self._get_repo_path(repo)}/LiveOS/)
         end
       end
     end
