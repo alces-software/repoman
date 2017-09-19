@@ -56,7 +56,6 @@ module Commands
     end
 
     def self.validate
-      self._if_exists(self._get_source_path)
       self.validate_other
     end
 
@@ -93,6 +92,7 @@ module Commands
     end
 
     def self.validate_other
+      self._if_exists(self._get_source_path)
       @args['include'].each do |repo|
         self._if_exists(self._get_source_file_path(repo))
       end
@@ -115,6 +115,12 @@ module Commands
         @required = ['reporoot']
       else
         @required = ['distro', 'include', 'reporoot']
+      end
+    end
+
+    def self.validate_other
+      if @args['distro']
+        self._if_exists(self._get_source_path)
       end
     end
 
