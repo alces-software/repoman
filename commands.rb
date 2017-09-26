@@ -23,6 +23,7 @@
 require 'fileutils'
 
 $repomanroot = '/opt/repoman'
+$searchpaths = ['/var/lib/repoman', '/opt/repoman/']
 
 module Commands
   
@@ -64,8 +65,9 @@ module Commands
 
     def self._if_exists(file_or_dir)
       if ! File.exist?(file_or_dir)
-        puts "#{file_or_dir} does not exist"
-        exit 1
+        return false
+      else
+        return true
       end
     end
 
@@ -76,6 +78,21 @@ module Commands
 
     def self._get_source_path()
       return "#{$repomanroot}/templates/#{@args['distro'].split(/(\d+)/).join('/')}"
+    end
+
+    def self.find_file(file)
+      $searchpaths.each do |path|
+        search = self._get_template_file_path(path, file)
+        if self._if_exists(search)
+          return search
+        end
+      end
+      STDERR.puts "#{file} does not exist in search path"
+      exit 1
+    end
+
+    def self._get_template_file_path(path, file)
+      return "#{path}/templates/#{@args['distro'].split(/(\d+)/).join('/')}/#{file}"
     end
 
     def self._get_source_file_path(file)
@@ -92,16 +109,16 @@ module Commands
     end
 
     def self.validate_other
-      self._if_exists(self._get_source_path)
-      @args['include'].each do |repo|
-        self._if_exists(self._get_source_file_path(repo))
-      end
+      #self._if_exists(self._get_source_path)
+      #@args['include'].each do |repo|
+      #  self._if_exists(self._get_source_file_path(repo))
+      #end
     end
 
     def self.main
       sourcefiles = []
       @args['include'].each do |repo|
-        sourcefiles << self._get_source_file_path(repo)
+        sourcefiles << self.find_file(repo)
       end
       %x(cat #{sourcefiles.join(' ')} > #{@args['outfile']})
       puts "The file(s) #{sourcefiles.join(' ')} have been saved to #{@args['outfile']}"
