@@ -62,16 +62,8 @@ class MainParser
         exit
       end
 
-      opt.on("--configurlsearch URL-TO-FIND","the url string to be replaced by","`configurlreplace` in `configfile` [MIRROR ONLY]") do |urlsearch|
-        options["configurlsearch"] = urlsearch
-      end
-
-      opt.on("--configurlreplace URL-TO-REPLACE","the url string to replace","`configurlsearch` in `configfile` [MIRROR ONLY]") do |urlreplace|
-        options["configurlreplace"] = urlreplace
-      end
-
-      opt.on("--configfile","the file to perform url replacement on [MIRROR ONLY]") do |configfile|
-        options["configfile"] = configfile
+      opt.on("--configurl REPO-URL","the url for the local repository [MIRROR ONLY]") do |configurl|
+        options["configurl"] = configurl
       end
 
       opt.on("--no-mirror","do not update repository packages [MIRROR ONLY]") do |mirror|

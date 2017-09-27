@@ -24,11 +24,11 @@ git clone https://github.com/alces-software/repoman.git
 * To setup a server
 
 ```bash
-/opt/repoman/repoman.rb mirror --distro rhel7 --include base.local --reporoot /opt/alces/repo
+/opt/repoman/repoman.rb mirror --distro rhel7 --include base.local --reporoot /opt/alces/repo --configurl http://myrepo.com/path/to/repo
 ```
 
 * To resync and existing repository
 
 ```bash
-/opt/repoman/repoman.rb mirror --reporoot /opt/alces/repo --no-conf
+/opt/repoman/repoman.rb mirror --distro rhel7 --reporoot /opt/alces/repo --configurl http://myrepo.com/path/to/repo --no-conf
 ```
