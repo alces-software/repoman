@@ -208,7 +208,7 @@ reposdir=/dev/null
     end
 
     def self.local_conf
-      repolocal = if @args.key?["configout"]
+      repolocal = if @args.key?("configout")
                     @args["configout"]
                   else
                     "#{$repomanvar}/templates/#{@distro_path}/local.repo"
