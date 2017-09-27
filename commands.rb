@@ -23,7 +23,8 @@
 require 'fileutils'
 
 $repomanroot = '/opt/repoman'
-$searchpaths = ['/var/lib/repoman', '/opt/repoman/']
+$repomanvar = '/var/lib/repoman'
+$searchpaths = [$repomanvar, $repomanroot]
 
 module Commands
   
@@ -31,9 +32,15 @@ module Commands
     
     def self.run(args)
       @args = args
+      @distro_path = @args['distro'].split(/(\d+)/).join('/')
+      self.prerequisites
       self.check_required
       self.validate
       self.main
+    end
+
+    def self.prerequisites
+      FileUtils::mkdir_p "#{$repomanvar}/templates/#{@distro_path}"
     end
 
     def self._required_init
@@ -77,7 +84,7 @@ module Commands
     end
 
     def self._get_source_path()
-      return "#{$repomanroot}/templates/#{@args['distro'].split(/(\d+)/).join('/')}"
+      return "#{$repomanroot}/templates/#{@distro_path}"
     end
 
     def self.find_file(file)
@@ -87,12 +94,13 @@ module Commands
           return search
         end
       end
-      STDERR.puts "#{file} does not exist in search path"
+      tmp = $searchpaths
+      STDERR.puts "#{file} does not exist in search paths: #{tmp.map! {|word| "#{word}/templates/#{@distro_path}"} ; tmp.join(', ')}"
       exit 1
     end
 
     def self._get_template_file_path(path, file)
-      return "#{path}/templates/#{@args['distro'].split(/(\d+)/).join('/')}/#{file}"
+      return "#{path}/templates/#{@distro_path}/#{file}"
     end
 
     def self._get_source_file_path(file)
@@ -136,9 +144,9 @@ module Commands
     end
 
     def self.validate_other
-      if @args['distro']
-        self._if_exists(self._get_source_path)
-      end
+      #if @args['distro']
+      #  self._if_exists(self._get_source_path)
+      #end
     end
 
     def self.main
@@ -160,7 +168,7 @@ module Commands
             FileUtils::mkdir_p @args['reporoot']
 
             rescue SystemCallError
-              puts "An error occurred when creating #{@args['reporoot']}, most likely the user has insufficient permissions to create the directory"
+              STDERR.puts "An error occurred when creating #{@args['reporoot']}, most likely the user has insufficient permissions to create the directory"
               exit 1
           end
         end
@@ -183,10 +191,14 @@ reposdir=/dev/null
 
         # Add all additional repo data to file
         @args['include'].each do |file|
-          File.write(@repoconf, %x(cat #{self._get_source_file_path(file)}), File.size(@repoconf), mode: 'a')
+          sourcefile = self.find_file(file)
+          File.write(@repoconf, %x(cat #{sourcefile}), File.size(@repoconf), mode: 'a')
         end
       else
-        self._if_exists(@repoconf)
+        if ! self._if_exists(@repoconf)
+          STDERR.puts "Existing repository config (#{@repoconf}) does not exist"
+          exit 1
+        end
       end
     end
 
