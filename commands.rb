@@ -83,10 +83,6 @@ module Commands
       exit 1
     end
 
-    def self._get_source_path()
-      return "#{$repomanroot}/templates/#{@distro_path}"
-    end
-
     def self.find_file(file)
       $searchpaths.each do |path|
         search = self._get_template_file_path(path, file)
@@ -103,12 +99,6 @@ module Commands
       return "#{path}/templates/#{@distro_path}/#{file}"
     end
 
-    def self._get_source_file_path(file)
-      # Split distro at integer and join back together with /
-      #return "#{$repomanroot}/templates/#{@args['distro'].split(/(\d+)/).join('/')}/#{file}"
-      return "#{self._get_source_path}/#{file}"
-    end
-
   end
 
   class Generate < Base
@@ -117,10 +107,6 @@ module Commands
     end
 
     def self.validate_other
-      #self._if_exists(self._get_source_path)
-      #@args['include'].each do |repo|
-      #  self._if_exists(self._get_source_file_path(repo))
-      #end
     end
 
     def self.main
@@ -144,9 +130,6 @@ module Commands
     end
 
     def self.validate_other
-      #if @args['distro']
-      #  self._if_exists(self._get_source_path)
-      #end
     end
 
     def self.main
