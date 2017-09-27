@@ -123,9 +123,9 @@ module Commands
   class Mirror < Base
     def self._required_init
       if ! @args['conf']
-        @required = ['reporoot']
+        @required = ['reporoot', 'configurl']
       else
-        @required = ['distro', 'include', 'reporoot']
+        @required = ['distro', 'include', 'reporoot', 'configurl']
       end
     end
 
@@ -140,6 +140,7 @@ module Commands
         self.sync_repo(repo)
         self.generate_metadata(repo)
       end
+      self.local_conf
     end
 
     def self.setup_repo
@@ -204,6 +205,15 @@ reposdir=/dev/null
         puts "Generating metadata for #{repo}"
         %x(createrepo #{group_data} #{self._get_repo_path(repo)})
       end
+    end
+
+    def self.local_conf
+      repolocal = "#{$repomanvar}/templates/#{@distro_path}/local.repo"
+      repoarray = @repoconf.split(/\n\n/)[1..-1]
+      repoarray.each do |config|
+        File.write(repolocal, config.gsub(/baseurl=.*/, "baseurl=#{@args['configurl']}/#{config.scan(/(?<=name=).*/).split(/-/).join('/')}"), File.size(repolocal), mode: 'a')
+      end
+      puts "The local repository config (for clients to use) has been saved to #{repolocal}"
     end
 
     def self._get_repo_path(reponame)
