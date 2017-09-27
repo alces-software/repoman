@@ -32,9 +32,9 @@ module Commands
     
     def self.run(args)
       @args = args
-      @distro_path = @args['distro'].split(/(\d+)/).join('/')
       self.prerequisites
       self.check_required
+      @distro_path = @args['distro'].split(/(\d+)/).join('/')
       self.validate
       self.main
     end
@@ -123,7 +123,7 @@ module Commands
   class Mirror < Base
     def self._required_init
       if ! @args['conf']
-        @required = ['reporoot', 'configurl']
+        @required = ['distro', 'reporoot', 'configurl']
       else
         @required = ['distro', 'include', 'reporoot', 'configurl']
       end
@@ -209,9 +209,12 @@ reposdir=/dev/null
 
     def self.local_conf
       repolocal = "#{$repomanvar}/templates/#{@distro_path}/local.repo"
-      repoarray = @repoconf.split(/\n\n/)[1..-1]
+      repoarray = File.read(@repoconf).split(/\n\n/)[1..-1]
+      File.write(repolocal, '')
       repoarray.each do |config|
-        File.write(repolocal, config.gsub(/baseurl=.*/, "baseurl=#{@args['configurl']}/#{config.scan(/(?<=name=).*/).split(/-/).join('/')}"), File.size(repolocal), mode: 'a')
+        repopath = config.scan(/(?<=name=).*/)[0].split(/-/).join('/')
+        File.write(repolocal, config.gsub(/baseurl=.*/, "baseurl=#{@args['configurl']}/#{repopath}"), File.size(repolocal), mode: 'a')
+        File.write(repolocal, "\n\n", File.size(repolocal), mode: 'a')
       end
       puts "The local repository config (for clients to use) has been saved to #{repolocal}"
     end
