@@ -57,13 +57,17 @@ class MainParser
         options["reporoot"] = reporoot
       end
 
+      opt.on("--configurl REPO-URL","the url for the local repository [MIRROR ONLY]") do |configurl|
+        options["configurl"] = configurl
+      end
+
+      opt.on("--configout OUTPUTFILE","the file to output repository files for clients to use", "(this is optional, if not specified then the file will", "be written to `/var/lib/repoman/templates/DISTRO/VERSION/local.repo` [MIRROR ONLY]") do |configout|
+        options["configout"] = configout
+      end
+
       opt.on("-h","--help","show this help screen") do
         puts opt
         exit
-      end
-
-      opt.on("--configurl REPO-URL","the url for the local repository [MIRROR ONLY]") do |configurl|
-        options["configurl"] = configurl
       end
 
       opt.on("--no-mirror","do not update repository packages [MIRROR ONLY]") do |mirror|

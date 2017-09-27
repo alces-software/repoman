@@ -208,7 +208,11 @@ reposdir=/dev/null
     end
 
     def self.local_conf
-      repolocal = "#{$repomanvar}/templates/#{@distro_path}/local.repo"
+      repolocal = if @args.key?["configout"]
+                    @args["configout"]
+                  else
+                    "#{$repomanvar}/templates/#{@distro_path}/local.repo"
+                  end
       repoarray = File.read(@repoconf).split(/\n\n/)[1..-1]
       File.write(repolocal, '')
       repoarray.each do |config|
