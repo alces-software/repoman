@@ -32,15 +32,11 @@ module Commands
     
     def self.run(args)
       @args = args
-      self.prerequisites
       self.check_required
       @distro_path = @args['distro'].split(/(\d+)/).join('/')
+      FileUtils::mkdir_p "#{$repomanvar}/templates/#{@distro_path}"
       self.validate
       self.main
-    end
-
-    def self.prerequisites
-      FileUtils::mkdir_p "#{$repomanvar}/templates/#{@distro_path}"
     end
 
     def self._required_init
@@ -217,8 +213,10 @@ reposdir=/dev/null
       File.write(repolocal, '')
       repoarray.each do |config|
         repopath = config.scan(/(?<=name=).*/)[0].split(/-/).join('/')
-        File.write(repolocal, config.gsub(/baseurl=.*/, "baseurl=#{@args['configurl']}/#{repopath}"), File.size(repolocal), mode: 'a')
-        File.write(repolocal, "\n\n", File.size(repolocal), mode: 'a')
+        if repopath != 'custom'
+          File.write(repolocal, config.gsub(/baseurl=.*/, "baseurl=#{@args['configurl']}/#{repopath}"), File.size(repolocal), mode: 'a')
+          File.write(repolocal, "\n\n", File.size(repolocal), mode: 'a')
+        end
       end
       puts "The local repository config (for clients to use) has been saved to #{repolocal}"
     end
