@@ -97,6 +97,17 @@ module Commands
 
   end
 
+  class Show < Base
+
+    def self.run()
+      $searchpaths.each do |path|
+        repofiles = Dir[path + '/templates/**/*'].reject {|fn| File.directory?(fn) }.map {|item| item.sub(/^.*\/templates\//, '') }
+        puts "Available in #{path}: #{repofiles}"
+      end
+    end
+
+  end
+
   class Generate < Base
     def self._required_init
       @required = ['distro', 'include', 'outfile']

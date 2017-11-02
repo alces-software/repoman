@@ -36,6 +36,7 @@ class MainParser
       opt.banner = "Usage: repoman COMMAND [OPTIONS]"
       opt.separator  ""
       opt.separator  "Commands"
+      opt.separator  "    show: show available repo config files"
       opt.separator  "    generate: setup client repo config files"
       opt.separator  "    mirror: clone upstream repos"
       opt.separator  ""

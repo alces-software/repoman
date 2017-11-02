@@ -32,6 +32,8 @@ options = MainParser.parse(ARGV)
 
 # Decide on function to run
 case ARGV[0]
+when "show"
+  Commands::Show.run()
 when "generate"
   Commands::Generate.run(options)
 when "mirror"
