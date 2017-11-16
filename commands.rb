@@ -95,6 +95,18 @@ module Commands
       return "#{path}/templates/#{@distro_path}/#{file}"
     end
 
+    def self.mkdir_wrapper(dir)
+      if ! File.directory?(dir)
+        begin
+          FileUtils::mkdir_p dir
+
+          rescue SystemCallError
+            STDERR.puts "An error occurred when creating #{dir}, most likely the user has insufficient permissions to  create the directory"
+            exit 1
+        end
+      end
+    end
+
   end
 
   class Show < Base
@@ -121,6 +133,7 @@ module Commands
       @args['include'].each do |repo|
         sourcefiles << self.find_file(repo)
       end
+      self.mkdir_wrapper(File.dirname(@args['outfile']))
       %x(cat #{sourcefiles.join(' ')} > #{@args['outfile']})
       puts "The file(s) #{sourcefiles.join(' ')} have been saved to #{@args['outfile']}"
     end
@@ -154,15 +167,7 @@ module Commands
       if @args['conf']
 
         # Create reporoot if it doesn't exist
-        if ! File.directory?(@args['reporoot'])
-          begin
-            FileUtils::mkdir_p @args['reporoot']
-
-            rescue SystemCallError
-              STDERR.puts "An error occurred when creating #{@args['reporoot']}, most likely the user has insufficient permissions to create the directory"
-              exit 1
-          end
-        end
+        self.mkdir_wrapper(@args['reporoot'])
 
         # Create top of mirror.conf file with general config
         File.write(@repoconf, '
