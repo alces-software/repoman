@@ -72,7 +72,7 @@ class MainParser
       end
 
       opt.on("--custom","setup a custom repository [MIRROR ONLY]") do |custom|
-        option['custom'] = custom
+        options['custom'] = custom
       end
 
       opt.on("--no-mirror","do not update repository packages [MIRROR ONLY]") do |mirror|
