@@ -161,7 +161,9 @@ module Commands
         self.generate_metadata(repo)
       end
       self.local_conf
-      self.custom_repo
+      if @args['custom']
+        self.custom_repo
+      end
     end
 
     def self.setup_repo
