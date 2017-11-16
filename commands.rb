@@ -160,6 +160,9 @@ module Commands
         self.sync_repo(repo)
         self.generate_metadata(repo)
       end
+      if @args['custom']
+        self.generate_metadata('custom')
+      end
       self.local_conf
     end
 
@@ -168,6 +171,12 @@ module Commands
 
         # Create reporoot if it doesn't exist
         self.mkdir_wrapper(@args['reporoot'])
+        
+        # Create repository directory
+        if @args['custom']
+          customrepo = @args['reporoot'] + '/custom'
+          self.mkdir_wrapper(customrepo)
+        end
 
         # Create top of mirror.conf file with general config
         File.write(@repoconf, '
@@ -233,6 +242,19 @@ reposdir=/dev/null
           File.write(repolocal, config.gsub(/baseurl=.*/, "baseurl=#{@args['configurl']}/#{repopath}"), File.size(repolocal), mode: 'a')
           File.write(repolocal, "\n\n", File.size(repolocal), mode: 'a')
         end
+      end
+      if @args['custom']
+        File.write(repolocal, "
+[custom]
+name=custom
+baseurl=#{@args['configurl']}/custom
+description=Custom repository
+enabled=1
+ski_if_unavailable=1
+gpgcheck=0
+priority=11
+
+", File.size(repolocal), mode: 'a')
       end
       puts "The local repository config (for clients to use) has been saved to #{repolocal}"
     end
