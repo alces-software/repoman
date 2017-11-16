@@ -161,6 +161,7 @@ module Commands
         self.generate_metadata(repo)
       end
       self.local_conf
+      self.custom_repo
     end
 
     def self.setup_repo
@@ -235,6 +236,37 @@ reposdir=/dev/null
         end
       end
       puts "The local repository config (for clients to use) has been saved to #{repolocal}"
+    end
+
+    def self.custom_repo
+      # Create repository directory
+      customrepo = args['reporoot'] + '/custom'
+      self.mkdir_wrapper(customrepo)
+
+      # Generate metadata
+      if @args['meta']
+        group_data = if File.file?(self._get_repo_path('custom') + '/comps.xml') then '-g comps.xml' else '' end
+        puts "Generating metadata for custom"
+        %x(createrepo #{group_data} #{self._get_repo_path('custom')})
+      end
+      
+      # Add to local repo file
+      repolocal = if @args.key?("configout")
+                     @args["configout"]
+                   else
+                     "#{$repomanvar}/templates/#{@distro_path}/local.repo"
+                   end
+      File.write(repolocal, "
+ [custom]
+ name=custom
+ baseurl=#{repopath}/custom
+ description=Custom repository
+ enabled=1
+ ski_if_unavailable=1
+ gpgcheck=0
+ priority=11
+
+ ", File.size(repolocal), mode: 'a')
     end
 
     def self._get_repo_path(reponame)
