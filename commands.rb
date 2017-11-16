@@ -160,10 +160,10 @@ module Commands
         self.sync_repo(repo)
         self.generate_metadata(repo)
       end
-      self.local_conf
       if @args['custom']
-        self.custom_repo
+        self.generate_metadata('custom')
       end
+      self.local_conf
     end
 
     def self.setup_repo
@@ -171,6 +171,12 @@ module Commands
 
         # Create reporoot if it doesn't exist
         self.mkdir_wrapper(@args['reporoot'])
+        
+        # Create repository directory
+        if @args['custom']
+          customrepo = @args['reporoot'] + '/custom'
+          self.mkdir_wrapper(customrepo)
+        end
 
         # Create top of mirror.conf file with general config
         File.write(@repoconf, '
@@ -237,38 +243,20 @@ reposdir=/dev/null
           File.write(repolocal, "\n\n", File.size(repolocal), mode: 'a')
         end
       end
-      puts "The local repository config (for clients to use) has been saved to #{repolocal}"
-    end
+      if @args['custom']
+        File.write(repolocal, "
+[custom]
+name=custom
+baseurl=#{@args['configurl']}/custom
+description=Custom repository
+enabled=1
+ski_if_unavailable=1
+gpgcheck=0
+priority=11
 
-    def self.custom_repo
-      # Create repository directory
-      customrepo = args['reporoot'] + '/custom'
-      self.mkdir_wrapper(customrepo)
-
-      # Generate metadata
-      if @args['meta']
-        group_data = if File.file?(self._get_repo_path('custom') + '/comps.xml') then '-g comps.xml' else '' end
-        puts "Generating metadata for custom"
-        %x(createrepo #{group_data} #{self._get_repo_path('custom')})
+", File.size(repolocal), mode: 'a')
       end
-      
-      # Add to local repo file
-      repolocal = if @args.key?("configout")
-                     @args["configout"]
-                   else
-                     "#{$repomanvar}/templates/#{@distro_path}/local.repo"
-                   end
-      File.write(repolocal, "
- [custom]
- name=custom
- baseurl=#{repopath}/custom
- description=Custom repository
- enabled=1
- ski_if_unavailable=1
- gpgcheck=0
- priority=11
-
- ", File.size(repolocal), mode: 'a')
+      puts "The local repository config (for clients to use) has been saved to #{repolocal}"
     end
 
     def self._get_repo_path(reponame)
