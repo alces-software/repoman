@@ -71,6 +71,10 @@ class MainParser
         exit
       end
 
+      opt.on("--custom","setup a custom repository [MIRROR ONLY]") do |custom|
+        option['custom'] = custom
+      end
+
       opt.on("--no-mirror","do not update repository packages [MIRROR ONLY]") do |mirror|
         options['mirror'] = mirror
       end
@@ -79,7 +83,7 @@ class MainParser
         options['meta'] = meta
       end
 
-      opt.on("--no-conf","do not setup repository but update existing repos [MIRROR ONLY]") do |conf|
+      opt.on("--no-conf","do not setup repository but update existing repos in `reporoot` [MIRROR ONLY]") do |conf|
         options['conf'] = conf
       end
 
