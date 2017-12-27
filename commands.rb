@@ -142,10 +142,9 @@ module Commands
 
   class Mirror < Base
     def self._required_init
-      if ! @args['conf']
-        @required = ['distro', 'reporoot', 'configurl']
-      else
-        @required = ['distro', 'include', 'reporoot', 'configurl']
+      @required = ['distro', 'reporoot', 'configurl']
+      if @args['conf']
+        @required << 'include'
       end
     end
 
